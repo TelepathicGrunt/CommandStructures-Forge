@@ -1,0 +1,18 @@
+modLoader="javafml"
+loaderVersion="[1,)"
+license="MIT License"
+
+[[mods]]
+    modId="command_structures"
+    version="${file.jarVersion}"
+    displayName="Command Structure Mod"
+    logoFile="commandstructures.png"
+    logoBlur=false
+    authors="TelepathicGrunt"
+    description='''
+    Spawn structures by command'''
+
+[[dependencies.command_structures]]
+    modId="minecraft"
+    type="required"
+    versionRange="[1.20.5,)"
