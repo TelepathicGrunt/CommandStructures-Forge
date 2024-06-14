@@ -36,10 +36,12 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.PoolElementStructurePiece;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructurePiece;
+import net.minecraft.world.level.levelgen.structure.pools.DimensionPadding;
 import net.minecraft.world.level.levelgen.structure.pools.JigsawPlacement;
 import net.minecraft.world.level.levelgen.structure.pools.SinglePoolElement;
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
 import net.minecraft.world.level.levelgen.structure.pools.alias.PoolAliasLookup;
+import net.minecraft.world.level.levelgen.structure.templatesystem.LiquidSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorList;
 
 import java.util.List;
@@ -142,7 +144,9 @@ public class StructureSpawnCommand {
                 legacyBoundingBoxRule,
                 heightmapSnap ? Optional.of(Heightmap.Types.WORLD_SURFACE_WG) : Optional.empty(),
                 80,
-                PoolAliasLookup.EMPTY);
+                PoolAliasLookup.EMPTY,
+                DimensionPadding.ZERO,
+                LiquidSettings.IGNORE_WATERLOGGING);
 
         if(pieceGenerator.isPresent()) {
             WorldgenRandom worldgenrandom;
@@ -164,7 +168,7 @@ public class StructureSpawnCommand {
                     if(piece instanceof PoolElementStructurePiece poolElementStructurePiece) {
                         if(poolElementStructurePiece.getElement() instanceof SinglePoolElement singlePoolElement) {
                             Holder<StructureProcessorList> oldProcessorList = ((SinglePoolElementAccessor)singlePoolElement).getProcessors();
-                            ResourceKey<StructureProcessorList> emptyKey = ResourceKey.create(Registries.PROCESSOR_LIST, new ResourceLocation("minecraft", "empty"));
+                            ResourceKey<StructureProcessorList> emptyKey = ResourceKey.create(Registries.PROCESSOR_LIST, ResourceLocation.fromNamespaceAndPath("minecraft", "empty"));
                             Optional<Holder.Reference<StructureProcessorList>> emptyProcessorList = cs.getSource().getLevel().registryAccess().registryOrThrow(Registries.PROCESSOR_LIST).getHolder(emptyKey);
                             emptyProcessorList.ifPresent(processor -> ((SinglePoolElementAccessor)singlePoolElement).setProcessors(processor));
                             generatePiece(level, level.getChunkSource().getGenerator(), chunkPos, worldgenrandom, finalCenterPos, piece);

@@ -8,13 +8,12 @@ buildscript {
 
 plugins {
 	id 'fabric-loom' version '1.6-SNAPSHOT'
-	id "com.modrinth.minotaur" version "2.+"
-	id "net.darkhax.curseforgegradle" version "1.0.7"
+	id "me.modmuss50.mod-publish-plugin" version "0.5.1"
 	id 'maven-publish'
 }
 
 apply plugin: 'maven-publish'
-apply plugin: "com.modrinth.minotaur"
+apply plugin: "me.modmuss50.mod-publish-plugin"
 
 sourceCompatibility = JavaVersion.VERSION_21
 targetCompatibility = JavaVersion.VERSION_21
@@ -56,38 +55,38 @@ jar {
 apply from: 'gradle/maven.gradle'
 
 String changelogText = file("CHANGELOG.md").getText('UTF-8')
+Map<String, String> env = System.getenv()
 
-task publishCurseForge(type: net.darkhax.curseforgegradle.TaskPublishCurseForge) {
-	apiToken = "$System.env.CURSEFORGEKEY"
-	int projectId = 565119
+publishMods {
+	file = jar.archiveFile
+	type = STABLE
 
-	def mainFile = upload(projectId, remapJar)
-	mainFile.changelog = changelogText
-	mainFile.changelogType = "markdown"
-	mainFile.releaseType = "release"
-	mainFile.displayName = "CommandStructures-Fabric v${project.mod_version} (${project.minecraft_version} MC)"
-	mainFile.addGameVersion("${project.minecraft_version}")
-	mainFile.addGameVersion("Fabric")
-}
+	displayName = "CommandStructures-Fabric v${project.mod_version} (${project.minecraft_version} MC)"
+	version = project.version + "_fabric"
 
-modrinth {
-	token = "$System.env.MODRINTH"
-	versionName = "CommandStructures-Fabric"
-	versionNumber = project.version + "_fabric"
-	uploadFile = remapJar
-	projectId = 'WEfvvlnl'
-	versionType = "RELEASE"
 	changelog = changelogText
-	gameVersions = ["${project.minecraft_version}"]
-	loaders = ['fabric']
-	dependencies {
-		required.project "fabric-api"
+	modLoaders.add("fabric")
+
+	if (env.CURSEFORGEKEY) {
+		curseforge {
+			accessToken = env.CURSEFORGEKEY
+			projectId = '565119'
+			minecraftVersions.add("1.21")
+			requires("fabric-api")
+		}
+	}
+
+	if (env.MODRINTH_TOKEN) {
+		modrinth {
+			accessToken = env.MODRINTH_TOKEN
+			projectId = 'WEfvvlnl'
+			minecraftVersions.add("1.21")
+			requires("fabric-api")
+		}
 	}
 }
 
 task buildAndRelease {}
 tasks.publish.mustRunAfter tasks.build
-tasks.publishCurseForge.mustRunAfter tasks.publish
-tasks.modrinth.mustRunAfter tasks.publish
-tasks.publishCurseForge.dependsOn("remapJar")
-tasks.buildAndRelease.dependsOn(tasks.build, tasks.publish, tasks.publishCurseForge, tasks.modrinth)
+tasks.publishMods.mustRunAfter tasks.publish
+tasks.buildAndRelease.dependsOn(tasks.build, tasks.publish, tasks.publishMods)

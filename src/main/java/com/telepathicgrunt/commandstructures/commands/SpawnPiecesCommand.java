@@ -111,7 +111,7 @@ public class SpawnPiecesCommand {
 
         ResourceManager resourceManager = cs.getSource().getLevel().getServer().getResourceManager();
         Set<String> modidStrings = new HashSet<>();
-        Set<ResourceLocation> rlSet = resourceManager.listResources("structures", (filename) -> filename.toString().endsWith(".nbt"))
+        Set<ResourceLocation> rlSet = resourceManager.listResources("structure", (filename) -> filename.toString().endsWith(".nbt"))
                 .keySet()
                 .stream()
                 .map(resourceLocation -> {
@@ -119,7 +119,7 @@ public class SpawnPiecesCommand {
                     modidStrings.add(namespace);
 
                     String path = resourceLocation.getPath()
-                            .replaceAll("structures/", "")
+                            .replaceAll("structure/", "")
                             .replaceAll(".nbt", "");
 
                     // We want to suggest folders instead of individual nbts
@@ -128,13 +128,13 @@ public class SpawnPiecesCommand {
                         path = path.substring(0, i) + "/";
                     }
 
-                    return new ResourceLocation(namespace, path);
+                    return ResourceLocation.fromNamespaceAndPath(namespace, path);
                 })
                 .collect(Collectors.toSet());
 
         // add suggestion for entire mods/vanilla too
         rlSet.addAll(modidStrings.stream()
-                .map(modid -> new ResourceLocation(modid, ""))
+                .map(modid -> ResourceLocation.fromNamespaceAndPath(modid, ""))
                 .collect(Collectors.toSet()));
 
         currentMinecraftServer = cs.getSource().getServer();
@@ -229,12 +229,12 @@ public class SpawnPiecesCommand {
 
     private static List<ResourceLocation> getResourceLocations(ServerLevel world, String modId, String filter) {
         ResourceManager resourceManager = world.getServer().getResourceManager();
-        return resourceManager.listResources("structures", (filename) -> filename.toString().endsWith(".nbt"))
+        return resourceManager.listResources("structure", (filename) -> filename.toString().endsWith(".nbt"))
                 .keySet()
                 .stream()
                 .filter(resourceLocation -> resourceLocation.getNamespace().equals(modId))
-                .filter(resourceLocation -> resourceLocation.getPath().startsWith("structures/" + filter))
-                .map(resourceLocation -> new ResourceLocation(resourceLocation.getNamespace(), resourceLocation.getPath().replaceAll("^structures/", "").replaceAll(".nbt$", "")))
+                .filter(resourceLocation -> resourceLocation.getPath().startsWith("structure/" + filter))
+                .map(resourceLocation -> ResourceLocation.fromNamespaceAndPath(resourceLocation.getNamespace(), resourceLocation.getPath().replaceAll("^structure/", "").replaceAll(".nbt$", "")))
                 .toList();
     }
 
