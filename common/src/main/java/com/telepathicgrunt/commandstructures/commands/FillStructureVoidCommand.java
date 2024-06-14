@@ -25,8 +25,6 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class FillStructureVoidCommand {
-    private static MinecraftServer currentMinecraftServer = null;
-
     public static void createCommand(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext) {
         String commandString = "fillstructurevoid";
         String sizeArg = "radius";

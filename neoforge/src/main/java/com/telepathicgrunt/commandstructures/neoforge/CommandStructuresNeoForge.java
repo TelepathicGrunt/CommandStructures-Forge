@@ -1,5 +1,6 @@
-package com.telepathicgrunt.commandstructures;
+package com.telepathicgrunt.commandstructures.neoforge;
 
+import com.telepathicgrunt.commandstructures.CommandStructuresMain;
 import com.telepathicgrunt.commandstructures.commands.FillStructureVoidCommand;
 import com.telepathicgrunt.commandstructures.commands.SpawnMobsCommand;
 import com.telepathicgrunt.commandstructures.commands.SpawnPiecesCommand;
@@ -12,23 +13,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 @Mod(CommandStructuresMain.MODID)
-public class CommandStructuresMain {
+public class CommandStructuresNeoForge {
 
-    public static final Logger LOGGER = LogManager.getLogger();
-    public static final String MODID = "command_structures";
-
-    public CommandStructuresMain() {
+    public CommandStructuresNeoForge() {
         IEventBus forgeBus = NeoForge.EVENT_BUS;
         forgeBus.addListener(this::registerCommand);
 
-        // Silences logspam due to some mc implementations with spawning structures rawly like Mineshafts
-        Logger rootLogger = LogManager.getRootLogger();
-        if (rootLogger instanceof org.apache.logging.log4j.core.Logger) {
-            ((org.apache.logging.log4j.core.Logger) rootLogger).addFilter(new LogSpamFiltering());
-        }
-        else {
-            LOGGER.error("Registration failed with unexpected class: {}", rootLogger.getClass());
-        }
+        CommandStructuresMain.CommandStructuresInit();
     }
 
     private void registerCommand(RegisterCommandsEvent event) {

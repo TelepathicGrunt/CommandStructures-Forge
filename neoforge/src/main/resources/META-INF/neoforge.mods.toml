@@ -1,10 +1,10 @@
 modLoader="javafml"
-loaderVersion="[1,)"
+loaderVersion="[3,)"
 license="MIT License"
 
 [[mods]]
     modId="command_structures"
-    version="${file.jarVersion}"
+    version="${version}"
     displayName="Command Structure Mod"
     logoFile="commandstructures.png"
     logoBlur=false
@@ -12,7 +12,10 @@ license="MIT License"
     description='''
     Spawn structures by command'''
 
+[[mixins]]
+    config = "command_structures.mixins.json"
+
 [[dependencies.command_structures]]
     modId="minecraft"
     type="required"
-    versionRange="[1.20.5,)"
+    versionRange="[1.21,)"

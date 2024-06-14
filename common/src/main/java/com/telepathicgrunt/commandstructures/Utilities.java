@@ -1,5 +1,6 @@
 package com.telepathicgrunt.commandstructures;
 
+import com.telepathicgrunt.commandstructures.mixin.ChunkMapAccessor;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
@@ -10,7 +11,7 @@ public final class Utilities {
     private Utilities() {}
 
     public static void refreshChunksOnClients(ServerLevel level) {
-        int viewDistance = level.getChunkSource().chunkMap.serverViewDistance;
+        int viewDistance = ((ChunkMapAccessor)level.getChunkSource().chunkMap).getServerViewDistance();
         level.players().forEach(player -> {
             for(int x = -viewDistance; x <= viewDistance; x++) {
                 for(int z = -viewDistance; z <= viewDistance; z++) {

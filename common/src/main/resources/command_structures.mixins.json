@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.telepathicgrunt.commandstructures.mixin",
+  "mixins": [
+    "ChunkMapAccessor",
+    "SinglePoolElementAccessor"
+  ],
+  "client": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

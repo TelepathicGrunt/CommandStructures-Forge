@@ -10,6 +10,7 @@ import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.telepathicgrunt.commandstructures.CommandStructuresMain;
 import com.telepathicgrunt.commandstructures.Utilities;
+import com.telepathicgrunt.commandstructures.mixin.SinglePoolElementAccessor;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -166,12 +167,12 @@ public class StructureSpawnCommand {
                 if(disableProcessors) {
                     if(piece instanceof PoolElementStructurePiece poolElementStructurePiece) {
                         if(poolElementStructurePiece.getElement() instanceof SinglePoolElement singlePoolElement) {
-                            Holder<StructureProcessorList> oldProcessorList = singlePoolElement.processors;
+                            Holder<StructureProcessorList> oldProcessorList = ((SinglePoolElementAccessor)singlePoolElement).getProcessors();
                             ResourceKey<StructureProcessorList> emptyKey = ResourceKey.create(Registries.PROCESSOR_LIST, ResourceLocation.fromNamespaceAndPath("minecraft", "empty"));
                             Optional<Holder.Reference<StructureProcessorList>> emptyProcessorList = cs.getSource().getLevel().registryAccess().registryOrThrow(Registries.PROCESSOR_LIST).getHolder(emptyKey);
-                            emptyProcessorList.ifPresent(processors -> singlePoolElement.processors = processors);
+                            emptyProcessorList.ifPresent(processors -> ((SinglePoolElementAccessor)singlePoolElement).setProcessors(processors));
                             generatePiece(level, level.getChunkSource().getGenerator(), chunkPos, worldgenrandom, finalCenterPos, piece);
-                            singlePoolElement.processors = oldProcessorList; // Set the processors back or else our change is permanent.
+                            ((SinglePoolElementAccessor)singlePoolElement).setProcessors(oldProcessorList); // Set the processors back or else our change is permanent.
                         }
                     }
                 }
