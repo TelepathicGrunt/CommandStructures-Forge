@@ -82,10 +82,10 @@ publishing {
                 builtBy remapSourcesJar
             }
 
-            artifactId = "$rootProject.name"
+            artifactId = "$rootProject.name-Neoforge"
 
             pom {
-                name = 'CommandStructures-NeoForge'
+                name = 'CommandStructures-Neoforge'
                 description = 'spawn structures by command'
                 url = 'https://github.com/TelepathicGrunt/CommandStructures'
 
