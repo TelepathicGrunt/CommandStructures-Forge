@@ -55,7 +55,7 @@ subprojects {
             type = STABLE
             changelog = changelogText
 
-            displayName = "CommandStructures-Neoforge v${project.mod_version} (${project.minecraft_version} MC)"
+            displayName = "CommandStructures-${name.capitalize()} v${project.mod_version} (${project.minecraft_version} MC)"
             version = "${project.version}"
             modLoaders.add(name)
 
