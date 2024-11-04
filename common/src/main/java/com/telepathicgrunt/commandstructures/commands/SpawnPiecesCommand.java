@@ -67,40 +67,35 @@ public class SpawnPiecesCommand {
                             new WorldCoordinate(false, cs.getSource().getPosition().y()),
                             new WorldCoordinate(false, cs.getSource().getPosition().z())
                     );
-                    spawnPieces(cs.getArgument(rlArg, ResourceLocation.class), worldCoordinates, false, Blocks.BARRIER.defaultBlockState(), Blocks.AIR.defaultBlockState(), 13, 48, cs);
+                    spawnPieces(cs.getArgument(rlArg, ResourceLocation.class), worldCoordinates, false, Blocks.BARRIER.defaultBlockState(), Blocks.AIR.defaultBlockState(), 13, cs);
                     return 1;
                 })
                 .then(Commands.argument(locationArg, Vec3Argument.vec3())
                 .executes(cs -> {
-                    spawnPieces(cs.getArgument(rlArg, ResourceLocation.class), Vec3Argument.getCoordinates(cs, locationArg), false, Blocks.BARRIER.defaultBlockState(), Blocks.AIR.defaultBlockState(), 13, 48, cs);
+                    spawnPieces(cs.getArgument(rlArg, ResourceLocation.class), Vec3Argument.getCoordinates(cs, locationArg), false, Blocks.BARRIER.defaultBlockState(), Blocks.AIR.defaultBlockState(), 13, cs);
                     return 1;
                 })
                 .then(Commands.argument(savepieceArg, BoolArgumentType.bool())
                 .executes(cs -> {
-                    spawnPieces(cs.getArgument(rlArg, ResourceLocation.class), Vec3Argument.getCoordinates(cs, locationArg), cs.getArgument(savepieceArg, boolean.class), Blocks.BARRIER.defaultBlockState(), Blocks.AIR.defaultBlockState(), 13, 48, cs);
+                    spawnPieces(cs.getArgument(rlArg, ResourceLocation.class), Vec3Argument.getCoordinates(cs, locationArg), cs.getArgument(savepieceArg, boolean.class), Blocks.BARRIER.defaultBlockState(), Blocks.AIR.defaultBlockState(), 13, cs);
                     return 1;
                 })
                 .then(Commands.argument(floorblockArg, BlockStateArgument.block(buildContext))
                 .executes(cs -> {
-                    spawnPieces(cs.getArgument(rlArg, ResourceLocation.class), Vec3Argument.getCoordinates(cs, locationArg), cs.getArgument(savepieceArg, boolean.class), BlockStateArgument.getBlock(cs, floorblockArg).getState(), Blocks.AIR.defaultBlockState(), 13, 48, cs);
+                    spawnPieces(cs.getArgument(rlArg, ResourceLocation.class), Vec3Argument.getCoordinates(cs, locationArg), cs.getArgument(savepieceArg, boolean.class), BlockStateArgument.getBlock(cs, floorblockArg).getState(), Blocks.AIR.defaultBlockState(), 13, cs);
                     return 1;
                 })
                 .then(Commands.argument(fillerblockArg, BlockStateArgument.block(buildContext))
                 .executes(cs -> {
-                    spawnPieces(cs.getArgument(rlArg, ResourceLocation.class), Vec3Argument.getCoordinates(cs, locationArg), cs.getArgument(savepieceArg, boolean.class), BlockStateArgument.getBlock(cs, floorblockArg).getState(), BlockStateArgument.getBlock(cs, fillerblockArg).getState(), 13, 48, cs);
+                    spawnPieces(cs.getArgument(rlArg, ResourceLocation.class), Vec3Argument.getCoordinates(cs, locationArg), cs.getArgument(savepieceArg, boolean.class), BlockStateArgument.getBlock(cs, floorblockArg).getState(), BlockStateArgument.getBlock(cs, fillerblockArg).getState(), 13, cs);
                     return 1;
                 })
                 .then(Commands.argument(rowlengthArg, IntegerArgumentType.integer())
                 .executes(cs -> {
-                    spawnPieces(cs.getArgument(rlArg, ResourceLocation.class), Vec3Argument.getCoordinates(cs, locationArg), cs.getArgument(savepieceArg, boolean.class), BlockStateArgument.getBlock(cs, floorblockArg).getState(), BlockStateArgument.getBlock(cs, fillerblockArg).getState(), cs.getArgument(rowlengthArg, Integer.class), 48, cs);
+                    spawnPieces(cs.getArgument(rlArg, ResourceLocation.class), Vec3Argument.getCoordinates(cs, locationArg), cs.getArgument(savepieceArg, boolean.class), BlockStateArgument.getBlock(cs, floorblockArg).getState(), BlockStateArgument.getBlock(cs, fillerblockArg).getState(), cs.getArgument(rowlengthArg, Integer.class), cs);
                     return 1;
                 })
-                .then(Commands.argument(spacingArg, IntegerArgumentType.integer())
-                .executes(cs -> {
-                    spawnPieces(cs.getArgument(rlArg, ResourceLocation.class), Vec3Argument.getCoordinates(cs, locationArg), cs.getArgument(savepieceArg, boolean.class), BlockStateArgument.getBlock(cs, floorblockArg).getState(), BlockStateArgument.getBlock(cs, fillerblockArg).getState(), cs.getArgument(rowlengthArg, Integer.class), cs.getArgument(spacingArg, Integer.class), cs);
-                    return 1;
-                })
-        ))))))));
+        )))))));
 
         dispatcher.register(Commands.literal(commandString).redirect(source));
     }
@@ -143,7 +138,7 @@ public class SpawnPiecesCommand {
         return rlSet;
     }
 
-    public static void spawnPieces(ResourceLocation path, Coordinates coordinates, boolean savePieces, BlockState floorBlockState, BlockState fillBlockState, int rowlength, int spacing, CommandContext<CommandSourceStack> cs) throws CommandSyntaxException {
+    public static void spawnPieces(ResourceLocation path, Coordinates coordinates, boolean savePieces, BlockState floorBlockState, BlockState fillBlockState, int rowlength, CommandContext<CommandSourceStack> cs) throws CommandSyntaxException {
         ServerLevel level = cs.getSource().getLevel();
         Player player = cs.getSource().getEntity() instanceof Player player1 ? player1 : null;
         BlockPos pos = coordinates.getBlockPos(cs.getSource());
@@ -155,6 +150,16 @@ public class SpawnPiecesCommand {
             CommandStructuresMain.LOGGER.error(errorMsg);
             throw new SimpleCommandExceptionType(Component.translatable(errorMsg)).create();
         }
+
+        int spacing = 0;
+        for (ResourceLocation nbtRL : nbtRLs) {
+            Optional<StructureTemplate> optionalStructureTemplate = level.getServer().getStructureManager().get(nbtRL);
+            if (optionalStructureTemplate.isPresent()) {
+                StructureTemplate structureTemplate = optionalStructureTemplate.get();
+                spacing = Math.max(Math.max(spacing, structureTemplate.getSize().getX()), structureTemplate.getSize().getZ());
+            }
+        }
+        spacing += 1;
 
         // Size of area we will need
         int columnCount = rowlength;
