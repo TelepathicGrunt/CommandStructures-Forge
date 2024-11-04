@@ -1,4 +1,4 @@
-## **(V.4.4.1 Changes) (1.21 Minecraft)**
+## **(V.4.4.2 Changes) (1.21.1 Minecraft)**
 
-##### Misc:
-Fixed fabric jar not running in 1.21. Also updated to newest neo just in case
+##### Commands:
+Made /spacepieces command calculate the smallest spacing value to use to keep pieces on a grid if user does not specify spacing param.
