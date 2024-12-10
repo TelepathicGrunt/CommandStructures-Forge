@@ -22,6 +22,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -107,7 +108,7 @@ public class SpawnMobsCommand {
                 .filter(e -> namespace.equals("all") || e.getKey().location().getNamespace().equals(namespace))
                 .map(Map.Entry::getValue).toList();
 
-        List<Entity> entities = types.stream().map(e -> e.create(level)).collect(Collectors.toList());
+        List<Entity> entities = types.stream().map(e -> e.create(level, EntitySpawnReason.COMMAND)).collect(Collectors.toList());
         if (livingEntitiesOnly) {
             entities = entities.stream().filter(e -> e instanceof LivingEntity).collect(Collectors.toList());
         }

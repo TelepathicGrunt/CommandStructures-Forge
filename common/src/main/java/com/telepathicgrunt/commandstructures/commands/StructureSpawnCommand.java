@@ -105,7 +105,7 @@ public class StructureSpawnCommand {
     }
 
     private static Set<ResourceLocation> startPoolSuggestions(CommandContext<CommandSourceStack> cs) {
-        return cs.getSource().getLevel().registryAccess().registryOrThrow(Registries.TEMPLATE_POOL).keySet();
+        return cs.getSource().getLevel().registryAccess().lookupOrThrow(Registries.TEMPLATE_POOL).keySet();
     }
 
     private static void generateStructure(Coordinates coordinates, ResourceLocation structureStartPoolRL, int depth, boolean heightmapSnap, boolean legacyBoundingBoxRule, boolean disableProcessors, boolean sendChunkLightingPacket, Long randomSeed, CommandContext<CommandSourceStack> cs) throws CommandSyntaxException {
@@ -113,9 +113,9 @@ public class StructureSpawnCommand {
         BlockPos centerPos = coordinates.getBlockPos(cs.getSource());
         if(heightmapSnap) centerPos = centerPos.below(centerPos.getY()); //not a typo. Needed so heightmap is not offset by player height.
 
-        StructureTemplatePool templatePool = level.registryAccess().registryOrThrow(Registries.TEMPLATE_POOL).get(structureStartPoolRL);
+        Optional<Holder.Reference<StructureTemplatePool>> templatePool = level.registryAccess().lookupOrThrow(Registries.TEMPLATE_POOL).get(structureStartPoolRL);
 
-        if(templatePool == null || templatePool.size() == 0) {
+        if(templatePool.isEmpty() || templatePool.get().value().size() == 0) {
             String errorMsg = structureStartPoolRL + " template pool does not exist or is empty";
             CommandStructuresMain.LOGGER.error(errorMsg);
             throw new SimpleCommandExceptionType(Component.translatable(errorMsg)).create();
@@ -137,7 +137,7 @@ public class StructureSpawnCommand {
 
         Optional<Structure.GenerationStub> pieceGenerator = JigsawPlacement.addPieces(
                 newGenerationContext,
-                Holder.direct(templatePool),
+                templatePool.get(),
                 Optional.empty(),
                 depth,
                 centerPos,
@@ -169,7 +169,7 @@ public class StructureSpawnCommand {
                         if(poolElementStructurePiece.getElement() instanceof SinglePoolElement singlePoolElement) {
                             Holder<StructureProcessorList> oldProcessorList = ((SinglePoolElementAccessor)singlePoolElement).getProcessors();
                             ResourceKey<StructureProcessorList> emptyKey = ResourceKey.create(Registries.PROCESSOR_LIST, ResourceLocation.fromNamespaceAndPath("minecraft", "empty"));
-                            Optional<Holder.Reference<StructureProcessorList>> emptyProcessorList = cs.getSource().getLevel().registryAccess().registryOrThrow(Registries.PROCESSOR_LIST).getHolder(emptyKey);
+                            Optional<Holder.Reference<StructureProcessorList>> emptyProcessorList = cs.getSource().getLevel().registryAccess().lookupOrThrow(Registries.PROCESSOR_LIST).get(emptyKey);
                             emptyProcessorList.ifPresent(processors -> ((SinglePoolElementAccessor)singlePoolElement).setProcessors(processors));
                             generatePiece(level, level.getChunkSource().getGenerator(), chunkPos, worldgenrandom, finalCenterPos, piece);
                             ((SinglePoolElementAccessor)singlePoolElement).setProcessors(oldProcessorList); // Set the processors back or else our change is permanent.
